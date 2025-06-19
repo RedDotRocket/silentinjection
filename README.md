@@ -17,7 +17,7 @@ Each **top-level subdirectory** inside the directory you scan is treated as a se
 Example:
 
 ```
-/codebase/
+/drive_volume/
 ├── project_a/
 │   └── file1.py
 ├── project_b/
