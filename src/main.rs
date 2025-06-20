@@ -10,6 +10,7 @@ use std::io::{Write, BufWriter};
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 enum Status {
     Safe,
+    PartiallySafe,
     Unsafe,
 }
 
@@ -22,7 +23,7 @@ fn is_commit_sha(s: &str) -> bool {
     sha_re.is_match(s)
 }
 
-fn scan_code_for_usage(code: &str) -> (usize, usize) {
+fn scan_code_for_usage(code: &str) -> (usize, usize, usize) {
     let use_auth_or_local_re = Regex::new(r#"use_auth_token\s*=\s*True|from_pretrained\(["'](\./|/)"#).unwrap();
     let revision_capture_re = Regex::new(r#"revision\s*=\s*["']([^"']+)["']"#).unwrap();
 
@@ -35,6 +36,7 @@ fn scan_code_for_usage(code: &str) -> (usize, usize) {
     ];
 
     let mut safe_count = 0;
+    let mut partial_count = 0;
     let mut unsafe_count = 0;
 
     for pattern in &patterns {
@@ -51,7 +53,7 @@ fn scan_code_for_usage(code: &str) -> (usize, usize) {
                 if is_commit_sha(val) {
                     safe_count += 1;
                 } else {
-                    unsafe_count += 1;
+                    partial_count += 1;
                 }
             } else {
                 unsafe_count += 1;
@@ -59,13 +61,13 @@ fn scan_code_for_usage(code: &str) -> (usize, usize) {
         }
     }
 
-    (safe_count, unsafe_count)
+    (safe_count, partial_count, unsafe_count)
 }
 
-fn scan_file(path: &Path) -> (usize, usize) {
+fn scan_file(path: &Path) -> (usize, usize, usize) {
     let content = match fs::read_to_string(path) {
         Ok(c) => c,
-        Err(_) => return (0, 0),
+        Err(_) => return (0, 0, 0),
     };
     scan_code_for_usage(&content)
 }
@@ -77,24 +79,29 @@ fn is_excluded(entry: &walkdir::DirEntry) -> bool {
             .any(|&e| entry.file_name().to_string_lossy().contains(e))
 }
 
-fn get_project_root(path: &Path, root_dir: &Path) -> String {
-    path.strip_prefix(root_dir)
-        .ok()
-        .and_then(|rel| rel.components().next())
-        .map(|c| c.as_os_str().to_string_lossy().to_string())
-        .unwrap_or_else(|| "unknown".to_string())
+/// Extract (org, repo) from a path like `root/org/repo/file.py`
+fn get_org_repo(path: &Path, root: &Path) -> (String, String) {
+    let rel_components = match path.strip_prefix(root) {
+        Ok(rel) => rel.components().map(|c| c.as_os_str().to_string_lossy().to_string()).collect::<Vec<_>>(),
+        Err(_) => return ("unknown".to_string(), "unknown".to_string()),
+    };
+
+    if rel_components.len() < 3 {
+        return ("unknown".to_string(), "unknown".to_string());
+    }
+
+    (rel_components[0].clone(), rel_components[1].clone())
 }
 
-fn write_csv(output_path: &str, project_data: &HashMap<String, Status>) -> std::io::Result<()> {
+fn write_file_csv(
+    output_path: &str,
+    file_data: &[(String, String, String, usize, usize, usize)],
+) -> std::io::Result<()> {
     let file = File::create(output_path)?;
     let mut writer = BufWriter::new(file);
-    writeln!(writer, "project,status")?;
-    for (project, status) in project_data {
-        let status_str = match status {
-            Status::Safe => "safe",
-            Status::Unsafe => "unsafe",
-        };
-        writeln!(writer, "{},{}", project, status_str)?;
+    writeln!(writer, "org,repo,file,safe_usages,partial_usages,unsafe_usages")?;
+    for (org, repo, file_path, safe, partial, unsafe_) in file_data {
+        writeln!(writer, "{},{},{},{},{},{}", org, repo, file_path, safe, partial, unsafe_)?;
     }
     Ok(())
 }
@@ -119,58 +126,82 @@ fn main() {
         .collect();
 
     let total_safe = Arc::new(Mutex::new(0));
+    let total_partial = Arc::new(Mutex::new(0));
     let total_unsafe = Arc::new(Mutex::new(0));
-    let project_statuses = Arc::new(Mutex::new(HashMap::<String, Status>::new()));
+    let project_statuses = Arc::new(Mutex::new(HashMap::<(String, String), Status>::new()));
+    let file_rows = Arc::new(Mutex::new(Vec::<(String, String, String, usize, usize, usize)>::new()));
 
     file_paths.par_iter().for_each(|entry| {
         let path = entry.path();
-        let (safe, unsafe_) = scan_file(path);
+        let (safe, partial, unsafe_) = scan_file(path);
 
-        if safe == 0 && unsafe_ == 0 {
+        if safe == 0 && partial == 0 && unsafe_ == 0 {
             return;
         }
 
-        let project = get_project_root(path, &root_dir);
+        let (org, repo) = get_org_repo(path, &root_dir);
+        let file_rel = path.strip_prefix(&root_dir).unwrap_or(path).to_string_lossy().to_string();
 
-        if unsafe_ > 0 {
-            *total_unsafe.lock().unwrap() += unsafe_;
-            project_statuses.lock().unwrap().insert(project, Status::Unsafe);
+        file_rows.lock().unwrap().push((org.clone(), repo.clone(), file_rel, safe, partial, unsafe_));
+
+        *total_safe.lock().unwrap() += safe;
+        *total_partial.lock().unwrap() += partial;
+        *total_unsafe.lock().unwrap() += unsafe_;
+
+        let mut statuses = project_statuses.lock().unwrap();
+        let key = (org.clone(), repo.clone());
+        let current = statuses.get(&key).cloned();
+
+        let new_status = if unsafe_ > 0 {
+            Status::Unsafe
+        } else if partial > 0 {
+            Status::PartiallySafe
         } else {
-            *total_safe.lock().unwrap() += safe;
-            project_statuses
-                .lock()
-                .unwrap()
-                .entry(project)
-                .or_insert(Status::Safe);
-        }
+            Status::Safe
+        };
+
+        let final_status = match (current, new_status) {
+            (Some(Status::Unsafe), _) => Status::Unsafe,
+            (_, Status::Unsafe) => Status::Unsafe,
+            (Some(Status::PartiallySafe), _) => Status::PartiallySafe,
+            (_, Status::PartiallySafe) => Status::PartiallySafe,
+            _ => Status::Safe,
+        };
+
+        statuses.insert(key, final_status);
     });
 
     let total_safe_usages = *total_safe.lock().unwrap();
+    let total_partial_usages = *total_partial.lock().unwrap();
     let total_unsafe_usages = *total_unsafe.lock().unwrap();
     let project_statuses = project_statuses.lock().unwrap();
 
     let safe_projects = project_statuses.values().filter(|&&s| s == Status::Safe).count();
+    let partial_projects = project_statuses.values().filter(|&&s| s == Status::PartiallySafe).count();
     let unsafe_projects = project_statuses.values().filter(|&&s| s == Status::Unsafe).count();
 
     println!("====== Scan Summary ======");
-    println!("Safe usages: {}", total_safe_usages);
-    println!("Unsafe usages: {}", total_unsafe_usages);
+    println!("Safe usages (with commit SHA): {}", total_safe_usages);
+    println!("Partially safe usages (with tag/branch): {}", total_partial_usages);
+    println!("Unsafe usages (no revision): {}", total_unsafe_usages);
     println!("Safe projects: {}", safe_projects);
+    println!("Partially safe projects: {}", partial_projects);
     println!("Unsafe projects: {}", unsafe_projects);
 
     if detailed {
         println!("\n====== Project Status ======");
-        for (project, status) in project_statuses.iter() {
+        for ((org, repo), status) in project_statuses.iter() {
             let status_str = match status {
                 Status::Safe => "safe",
+                Status::PartiallySafe => "partially_safe",
                 Status::Unsafe => "unsafe",
             };
-            println!("{:<40} {}", project, status_str);
+            println!("{:<20}/{:<20} {}", org, repo, status_str);
         }
     }
 
     if let Some(csv_file) = csv_output {
-        if let Err(e) = write_csv(csv_file, &project_statuses) {
+        if let Err(e) = write_file_csv(csv_file, &file_rows.lock().unwrap()) {
             eprintln!("Failed to write CSV: {}", e);
         } else {
             println!("CSV written to: {}", csv_file);
