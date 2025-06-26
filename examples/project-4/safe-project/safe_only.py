@@ -6,32 +6,32 @@ from transformers import AutoModel, AutoTokenizer
 
 # Safe model loading with commit SHA
 safe_model = AutoModel.from_pretrained(
-    "deepseek-ai/DeepSeek-V3",
+    "org/model",
     revision="5d0f2e8a7f1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d"
 )
 
 # Safe tokenizer with commit SHA
 safe_tokenizer = AutoTokenizer.from_pretrained(
-    "google-bert/bert-base-uncased",
+    "org/model",
     revision="a13d56a8b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0"
 )
 
 # Safe dataset loading with commit SHA
 safe_dataset = load_dataset(
-    "imdb", 
+    "org/dataset", 
     revision="b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0"
 )
 
 # Safe file download with commit SHA
 safe_file = hf_hub_download(
-    repo_id="microsoft/DialoGPT-medium",
+    repo_id="org/model",
     filename="config.json",
     revision="c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1"
 )
 
 # Safe snapshot download with commit SHA
 snapshot_download(
-    repo_id="microsoft/DialoGPT-medium",
+    repo_id="org/model",
     revision="d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2"
 )
 

@@ -12,12 +12,12 @@ safe_model = AutoModel.from_pretrained(
 
 # Partially safe tokenizer with tag
 partial_tokenizer = AutoTokenizer.from_pretrained(
-    "bert-base-uncased",
+    "model",
     revision="main"
 )
 
 # UNSAFE: This makes the whole project unsafe
-unsafe_model = AutoModel.from_pretrained("google/flan-t5-base")
+unsafe_model = AutoModel.from_pretrained("org/model")
 
 # Safe file download with commit SHA
 safe_file = hf_hub_download(

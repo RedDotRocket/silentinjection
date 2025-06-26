@@ -12,13 +12,13 @@ safe_model = AutoModel.from_pretrained(
 
 # Safe tokenizer with commit SHA
 safe_tokenizer = AutoTokenizer.from_pretrained(
-    "google-bert/bert-base-uncased",
+    "org/model",
     revision="a13d56a8b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0"
 )
 
 # PARTIALLY SAFE: This makes the project partially safe
 partial_model = AutoModel.from_pretrained(
-    "google/flan-t5-base",
+    "org/model",
     revision="main"
 )
 
