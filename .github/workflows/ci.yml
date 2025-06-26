@@ -1,0 +1,156 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        rust: [stable, beta, nightly]
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@v1
+      with:
+        toolchain: ${{ matrix.rust }}
+        components: rustfmt, clippy
+
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      with:
+        path: ~/.cargo/registry
+        key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Cache cargo index
+      uses: actions/cache@v4
+      with:
+        path: ~/.cargo/git
+        key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Cache cargo build
+      uses: actions/cache@v4
+      with:
+        path: target
+        key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Check formatting
+      run: cargo fmt -- --check
+      if: matrix.rust == 'stable'
+
+    - name: Run clippy
+      run: cargo clippy -- -D warnings
+      if: matrix.rust == 'stable'
+
+    - name: Run tests
+      run: cargo test --verbose
+
+    - name: Run tests (release mode)
+      run: cargo test --release --verbose
+
+  build:
+    name: Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: macos-latest
+            target: aarch64-apple-darwin
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@v1
+      with:
+        toolchain: stable
+        targets: ${{ matrix.target }}
+
+    - name: Build
+      run: cargo build --release --target ${{ matrix.target }}
+
+    - name: Strip binary (Linux/macOS)
+      if: matrix.os != 'windows-latest'
+      run: |
+        if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          strip target/${{ matrix.target }}/release/hfscanner
+        else
+          strip target/${{ matrix.target }}/release/hfscanner
+        fi
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: hfscanner-${{ matrix.target }}
+        path: |
+          target/${{ matrix.target }}/release/hfscanner
+          target/${{ matrix.target }}/release/hfscanner.exe
+
+  integration-test:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download Linux binary
+      uses: actions/download-artifact@v4
+      with:
+        name: hfscanner-x86_64-unknown-linux-gnu
+        path: ./
+
+    - name: Make binary executable
+      run: chmod +x ./hfscanner
+
+    - name: Test with example files
+      run: |
+        ./hfscanner @examples --summary
+        ./hfscanner @examples --detailed
+        ./hfscanner @examples --csv test_output.csv
+
+    - name: Verify CSV output
+      run: |
+        if [ ! -f test_output.csv ]; then
+          echo "CSV file not created!"
+          exit 1
+        fi
+        echo "CSV Contents:"
+        cat test_output.csv
+
+        # Check for expected entries
+        grep -q "unsafe_only.py,unsafe" test_output.csv || exit 1
+        grep -q "safe_only.py,safe" test_output.csv || exit 1
+        grep -q "partially_safe_only.py,partially_safe" test_output.csv || exit 1
+        echo "All expected entries found in CSV!"
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@v1
+      with:
+        toolchain: stable
+
+    - name: Install cargo-audit
+      run: cargo install cargo-audit
+
+    - name: Run security audit
+      run: cargo audit

@@ -12,7 +12,7 @@ partial_model = AutoModel.from_pretrained(
 
 # Partially safe tokenizer with version tag
 partial_tokenizer = AutoTokenizer.from_pretrained(
-    "bert-base-uncased",
+    "model",
     revision="v1.0"
 )
 
@@ -34,7 +34,7 @@ snapshot_download(
 
 # Another partially safe model with release tag
 another_partial_model = AutoModel.from_pretrained(
-    "google/flan-t5-base",
+    "org/model",
     revision="release-1.0"
 )
 
