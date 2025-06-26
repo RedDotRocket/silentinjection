@@ -154,9 +154,7 @@ fn main() {
         .into_iter()
         .filter_entry(|e| !is_excluded(e))
         .filter_map(|e| e.ok())
-        .filter(|e| {
-            e.file_type().is_file() && e.path().extension().is_some_and(|ext| ext == "py")
-        })
+        .filter(|e| e.file_type().is_file() && e.path().extension().is_some_and(|ext| ext == "py"))
         .collect();
 
     let total_safe = Arc::new(Mutex::new(0));
