@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <!-- Chart.js for interactive visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <main>
@@ -43,7 +45,7 @@
                     </div>
                     <pre><code class="language-python">from transformers import AutoTokenizer
 
-# AutoModel 
+# AutoModel
 unsafe_model = AutoModel.from_pretrained("org/model_name")
 
 unsafe_model_branch = AutoModel.from_pretrained(
@@ -186,10 +188,12 @@ safe_tokenizer = AutoTokenizer.from_pretrained(
                     </div>
                 </div>
 
-                <div class="image-placeholder">
-                    <div class="placeholder-content">
-                        <span>📈 Visual: Vulnerability Distribution</span>
-                        <p>Chart showing the prevalence of unpinned model usage across different industries</p>
+                <div class="interactive-chart-container">
+                    <div class="chart-header">
+                        <h3>📊 Interactive Vulnerability Distribution</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="vulnerability-scatter-plot"></canvas>
                     </div>
                 </div>
             </div>
@@ -234,5 +238,8 @@ bandit -r your_codebase/</code></pre>
             <p>&copy; 2024 Security Research by Luke Hinds & Fabian Kammel</p>
         </div>
     </footer>
+
+    <!-- Load the scatter plot script -->
+    <script src="scatter-plot.js"></script>
 </body>
 </html>

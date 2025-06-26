@@ -17,27 +17,27 @@
     --primary-200: #e2e8f0;
     --primary-100: #f1f5f9;
     --primary-50: #f8fafc;
-    
+
     --accent-600: #0ea5e9;
     --accent-500: #38bdf8;
     --accent-400: #7dd3fc;
-    
+
     --green-600: #059669;
     --green-500: #10b981;
     --green-400: #34d399;
-    
+
     --amber-600: #d97706;
     --amber-500: #f59e0b;
     --amber-400: #fbbf24;
-    
+
     --red-600: #dc2626;
     --red-500: #ef4444;
     --red-400: #f87171;
-    
+
     /* Typography */
     --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: 'IBM Plex Mono', 'SF Mono', Monaco, 'Cascadia Code', monospace;
-    
+
     /* Spacing */
     --space-xs: 0.5rem;
     --space-sm: 0.75rem;
@@ -47,7 +47,7 @@
     --space-2xl: 3rem;
     --space-3xl: 4rem;
     --space-4xl: 6rem;
-    
+
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -577,17 +577,125 @@ footer p {
     font-size: 1rem;
 }
 
+/* Interactive Chart Styles */
+.interactive-chart-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    padding: var(--space-xl);
+    margin: var(--space-2xl) 0;
+    border: 1px solid var(--primary-200);
+}
+
+.chart-header {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+}
+
+.chart-header h3 {
+    color: var(--primary-800);
+    margin-bottom: var(--space-sm);
+    font-size: 1.5rem;
+}
+
+.chart-header p {
+    color: var(--primary-600);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.chart-wrapper {
+    position: relative;
+    height: 500px;
+    margin: var(--space-lg) 0;
+    background: var(--primary-50);
+    border-radius: 8px;
+    padding: var(--space-md);
+}
+
+.chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-xl);
+    margin-top: var(--space-lg);
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 0.9rem;
+    color: var(--primary-700);
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 0, 0, 0.3);
+}
+
+.legend-color.safe {
+    background-color: rgba(34, 197, 94, 0.7);
+}
+
+.legend-color.warning {
+    background-color: rgba(251, 191, 36, 0.7);
+}
+
+.legend-color.danger {
+    background-color: rgba(249, 115, 22, 0.7);
+}
+
+.legend-color.critical {
+    background-color: rgba(239, 68, 68, 0.7);
+}
+
+/* Chart loading state */
+.chart-wrapper::before {
+    content: "Loading interactive chart...";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--primary-500);
+    font-style: italic;
+    z-index: 1;
+}
+
+.chart-wrapper.chart-loaded::before {
+    display: none;
+}
+
+.chart-wrapper canvas {
+    z-index: 2;
+    position: relative;
+}
+
+/* Chart error state */
+.chart-error {
+    text-align: center;
+    padding: var(--space-2xl);
+    color: var(--primary-600);
+}
+
+.chart-error h3 {
+    color: var(--red-600);
+    margin-bottom: var(--space-md);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .container {
         padding: 0 var(--space-md);
     }
-    
+
     section {
         padding: var(--space-2xl) 0;
     }
-    
-    
+
+
     .threats-grid,
     .comparison-grid,
     .stats-grid,
@@ -595,23 +703,44 @@ footer p {
         grid-template-columns: 1fr;
         gap: var(--space-lg);
     }
-    
+
     .research-highlight {
         flex-direction: column;
         text-align: center;
         gap: var(--space-sm);
     }
-    
+
     .stat {
         font-size: 2.5rem;
     }
-    
+
     .image-placeholder {
         padding: var(--space-xl);
     }
-    
+
     .placeholder-content span {
         font-size: 1.25rem;
+    }
+
+    /* Interactive chart responsive styles */
+    .interactive-chart-container {
+        padding: var(--space-lg);
+        margin: var(--space-xl) 0;
+    }
+
+    .chart-wrapper {
+        height: 400px;
+        padding: var(--space-sm);
+    }
+
+    .chart-legend {
+        gap: var(--space-lg);
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .legend-item {
+        font-size: 0.85rem;
     }
 }
 
@@ -619,27 +748,27 @@ footer p {
     h1 {
         font-size: 1.75rem;
     }
-    
+
     .subtitle {
         font-size: 1rem;
     }
-    
+
     .key-finding h2 {
         font-size: 1.75rem;
     }
-    
+
     .threat-card,
     .comparison-item,
     .stat-card,
     .author-card {
         padding: var(--space-lg);
     }
-    
+
     pre {
         padding: var(--space-md);
         font-size: 0.85rem;
     }
-    
+
     .code-header {
         padding: var(--space-md);
     }
@@ -673,16 +802,16 @@ button:focus {
 
 /* Print styles */
 @media print {
-    
+
     .image-placeholder {
         border: 1px solid #ccc;
     }
-    
+
     .code-example {
         box-shadow: none;
         border: 1px solid #ccc;
     }
-    
+
     .threat-card,
     .comparison-item,
     .stat-card,

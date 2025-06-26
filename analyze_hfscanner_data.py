@@ -216,24 +216,31 @@ def create_safety_trend_analysis(df):
     # Create the scatter plot
     plt.figure(figsize=(14, 10))
 
-    # Create scatter plot with bubble sizes based on total usages
-    scatter = plt.scatter(
+    # Create scatter plot with simple points
+    plt.scatter(
         significant_repos['total_usages'],
         significant_repos['safety_ratio'],
-        s=significant_repos['total_usages'] * 2,  # Bubble size based on total usages
         alpha=0.7,
-        c=significant_repos['unsafe_usages'],  # Color based on unsafe usages
-        cmap='Reds',
+        color='blue',
         edgecolors='black',
-        linewidth=1
+        linewidth=0.5
     )
 
     # Add labels for top repositories (high usage or high safety)
     top_repos = significant_repos.nlargest(15, 'total_usages')
     high_safety_repos = significant_repos[significant_repos['safety_ratio'] >= 0.1].nlargest(20, 'total_usages')  # Changed from 0.5 to 0.1 (10%)
 
+    # Always include all repositories with safety ratio > 0.4
+    very_safe_repos = significant_repos[significant_repos['safety_ratio'] > 0.4]
+
     # Combine and deduplicate for labeling
-    labeled_repos = pd.concat([top_repos, high_safety_repos]).drop_duplicates(subset=['org', 'repo'])
+    labeled_repos = pd.concat([top_repos, high_safety_repos, very_safe_repos]).drop_duplicates(subset=['org', 'repo'])
+
+    # Add labels for repositories meeting criteria: safety ratio > 0.4 OR total usages > 750
+    labeled_repos = significant_repos[
+        (significant_repos['safety_ratio'] > 0.4) |
+        (significant_repos['total_usages'] > 750)
+    ].copy()
 
     for idx, row in labeled_repos.iterrows():
         # Create shortened label
@@ -248,7 +255,7 @@ def create_safety_trend_analysis(df):
         if row['safety_ratio'] > 0.5:  # High safety
             xytext = (5, 5)
             fontsize = 8
-        elif row['total_usages'] > 500:  # High usage
+        elif row['total_usages'] > 1000:  # High usage
             xytext = (5, -5)
             fontsize = 8
         else:
@@ -288,15 +295,10 @@ def create_safety_trend_analysis(df):
 
     plt.xlabel('Total Hugging Face Usages', fontsize=12)
     plt.ylabel('Safety Ratio (Safe/Total)', fontsize=12)
-    plt.title('Safety Trend Analysis: Safety Ratio vs Total Usages\n(Bubble size = total usages, Color = unsafe usages)',
-              fontsize=14, weight='bold')
+    plt.title('Safety Trend Analysis: Safety Ratio vs Total Usages', fontsize=14, weight='bold')
 
     plt.grid(True, alpha=0.3)
     plt.legend()
-
-    # Add colorbar for unsafe usages
-    cbar = plt.colorbar(scatter)
-    cbar.set_label('Unsafe Usages', fontsize=10)
 
     plt.tight_layout()
 
