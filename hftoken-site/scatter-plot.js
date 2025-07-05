@@ -500,6 +500,6 @@ class VulnerabilityScatterPlot {
 document.addEventListener('DOMContentLoaded', function() {
     const scatterPlot = new VulnerabilityScatterPlot(
         'vulnerability-scatter-plot',
-        '../results/hfscanner.csv'
+        './results/hfscanner.csv'
     );
 });
