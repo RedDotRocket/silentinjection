@@ -122,9 +122,9 @@ jobs:
 
     - name: Test with example files
       run: |
-        ./hfscanner @examples --summary
-        ./hfscanner @examples --detailed
-        ./hfscanner @examples --csv test_output.csv
+        ./hfscanner examples --summary
+        ./hfscanner examples --detailed
+        ./hfscanner examples --csv test_output.csv
 
     - name: Verify CSV output
       run: |
