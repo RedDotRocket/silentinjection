@@ -34,11 +34,11 @@
             </div>
         </section>
 
+        <!-- Section One -->
         <section class="problem">
             <div class="container">
-                <h2>Vulnerability Analysis</h2>
+                <h2>Vulnerabile Configuration</h2>
                 <p>Through static analysis of 1,000+ open-source GitHub hosted repositories, we identified a pervasive anti-pattern in model dependency management. The following implementation demonstrates the security-critical misconfiguration:</p>
-
                 <div class="code-example">
                     <div class="code-header">
                         <span class="label danger">❌ Vulnerable Code</span>
@@ -72,16 +72,42 @@ unsafe_file_no_revision = hf_hub_download(
                 </div>
 
                 <p>This implementation exhibits <strong>mutable version pinning</strong>, automatically fetching the HEAD revision of the specified model repository. In the event of upstream account compromise, whether through credential theft, social engineering, or insider threat - malicious actors can perform silent model substitution. The absence of cryptographic verification or immutable references creates an attack vector where a trusted model could be swapped for a nefarious clone</p>
-
-                <!-- <div class="image-placeholder">
-                    <div class="placeholder-content">
-                        <span>📊 Visual: Attack Flow Diagram</span>
-                        <p>Diagram showing how compromised upstream models propagate to downstream applications</p>
-                    </div>
-                </div> -->
             </div>
         </section>
+        <section class="findings">
+            <div class="container">
+                <h2>Empirical Analysis</h2>
+                <p>Through automated static analysis of 1,247 public repositories containing Hugging Face dependencies, we quantified the prevalence of mutable dependency patterns across ML code bases.</p>
 
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Industry Impact</h3>
+                        <ul>
+                            <li><strong>1668</strong> unique repositories</li>
+                            <li>across <strong>1100</strong> organizations</li>
+                            <li>totaled to <strong>15320</strong> vulnearble files!</li>
+                        </ul>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Risk Classification</h3>
+                        <ul>
+                            <li><strong>Unsafe:</strong> 1618 repositories</li>
+                            <li><strong>Partially Safe:</strong> 48 repositories</li>
+                            <li><strong>Safe:</strong> 2 repositories</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Section Six -->
+                <div class="interactive-chart-container">
+                    <div class="chart-header">
+                        <h3>📊 Risk Distribution Over GitHub Orgs</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="vulnerability-scatter-plot"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
         <section class="threat-models">
             <div class="container">
                 <h2>ML Supply Chain Threat Model</h2>
@@ -109,7 +135,7 @@ unsafe_file_no_revision = hf_hub_download(
                     </div>
                 </div>
         </section>
-
+        <!-- Section Three -->
         <section class="solution">
             <div class="container">
                 <h2>Mitigation Strategy</h2>
@@ -130,9 +156,8 @@ safe_tokenizer = AutoTokenizer.from_pretrained(
 )
 </code></pre>
                 </div>
-
                 <p>This implementation enforces <strong>deterministic dependency resolution</strong> through SHA-256 commit pinning, ensuring model artifacts remain immutable regardless of upstream repository modifications. The revision parameter functions as a cryptographic checkpoint, preventing silent substitution attacks.</p>
-
+                <!-- Section Four -->
                 <div class="comparison-grid">
                     <div class="comparison-item vulnerability">
                         <h4>Mutable Revisions</h4>
@@ -153,56 +178,22 @@ safe_tokenizer = AutoTokenizer.from_pretrained(
                 </div>
             </div>
         </section>
+        <!-- Section Five -->
 
-        <section class="findings">
-            <div class="container">
-                <h2>Empirical Analysis</h2>
-                <p>Through automated static analysis of 1,247 public repositories containing Hugging Face dependencies, we quantified the prevalence of mutable dependency patterns across ML code bases.</p>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <h3>Industry Impact</h3>
-                        <ul>
-                            <li><strong>1668</strong> unique repositories</li>
-                            <li>across <strong>1100</strong> organizations</li>
-                            <li>totaled to <strong>15320</strong> vulnearble files!</li>
-                        </ul>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Risk Classification</h3>
-                        <ul>
-                            <li><strong>Unsafe:</strong> 1618 repositories</li>
-                            <li><strong>Partially Safe:</strong> 48 repositories</li>
-                            <li><strong>Safe:</strong> 2 repositories</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="interactive-chart-container">
-                    <div class="chart-header">
-                        <h3>📊 Risk Distribution</h3>
-                    </div>
-                    <div class="chart-wrapper">
-                        <canvas id="vulnerability-scatter-plot"></canvas>
-                    </div>
-                </div>
-            </div>
-        </section>
-
+        <!-- Section Seven -->
         <section class="detection">
             <div class="container">
                 <h2>Protect your code with Bandit</h2>
-                <p>We developed a static analysis plugin for the Open Source Bandit security linter to programmatically identify mutable dependency patterns in Python codebases. This tooling enables systematic vulnerability assessment across ML development pipelines:</p>
-
+                <p>We developed a static analysis component for the Open Source <a href="https://github.com/PyCQA/bandit" target="_blank" rel="noopener">Bandit</a> security scanner, that will  identify a lack of secure revision pinning in Python AI/ML codebases:</p>
                 <div class="code-example">
                     <div class="code-header">
-                        <span class="label tool">🔧 Detection with Bandit</span>
+                        <span class="label safe">🔧 Detection with Bandit</span>
                     </div>
                     <pre><code class="language-bash">pip install bandit
 bandit -r your_codebase/</code></pre>
                 </div>
 
-                <p>The <a href="https://github.com/PyCQA/bandit" target="_blank" rel="noopener">Bandit security framework</a> contains many other specialized detection rules for AI/ML insecure code patterns, along with protections against other known security risks associated with Python code</p>
+                <p>The Bandit security project, contains many other specialized detection rules for insecure code patterns in Python, along with other protections against other known security risks associated with Machine Leaning models, such as use of insecure pickle files, and insecure pytorch use.</p>
             </div>
         </section>
 
