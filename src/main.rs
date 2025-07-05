@@ -128,8 +128,7 @@ fn write_file_csv(
         let formatted_file = format_csv_field(file_path);
         writeln!(
             writer,
-            "{},{},{},{},{},{}",
-            formatted_org, formatted_repo, formatted_file, safe, partial, unsafe_
+            "{formatted_org},{formatted_repo},{formatted_file},{safe},{partial},{unsafe_}",
         )?;
     }
     Ok(())
@@ -240,15 +239,12 @@ fn main() {
         .count();
 
     println!("====== Scan Summary ======");
-    println!("Safe usages (with commit SHA): {}", total_safe_usages);
-    println!(
-        "Partially safe usages (with tag/branch): {}",
-        total_partial_usages
-    );
-    println!("Unsafe usages (no revision): {}", total_unsafe_usages);
-    println!("Safe projects: {}", safe_projects);
-    println!("Partially safe projects: {}", partial_projects);
-    println!("Unsafe projects: {}", unsafe_projects);
+    println!("Safe usages (with commit SHA): {total_safe_usages}");
+    println!("Partially safe usages (with tag/branch): {total_partial_usages}");
+    println!("Unsafe usages (no revision): {total_unsafe_usages}");
+    println!("Safe projects: {safe_projects}");
+    println!("Partially safe projects: {partial_projects}");
+    println!("Unsafe projects: {unsafe_projects}");
 
     if detailed {
         println!("\n====== Project Status ======");
@@ -258,15 +254,15 @@ fn main() {
                 Status::PartiallySafe => "partially_safe",
                 Status::Unsafe => "unsafe",
             };
-            println!("{:<20}/{:<20} {}", org, repo, status_str);
+            println!("{org:<20}/{repo:<20} {status_str}");
         }
     }
 
     if let Some(csv_file) = csv_output {
         if let Err(e) = write_file_csv(csv_file, &file_rows.lock().unwrap()) {
-            eprintln!("Failed to write CSV: {}", e);
+            eprintln!("Failed to write CSV: {e}");
         } else {
-            println!("CSV written to: {}", csv_file);
+            println!("CSV written to: {csv_file}");
         }
     }
 }
