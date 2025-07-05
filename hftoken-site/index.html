@@ -23,7 +23,7 @@
                 <div class="key-finding">
                     <h1>Silent Injection</h1>
                     <p class="subtitle">A widespread vulnerability in the AI Software Supply Chain</p>
-                    <p class="authors">Security Research by <strong>Luke Hinds</strong> & <strong>Fabian Kammel</strong></p>
+                    <p class="authors">Security Research by <strong><a href="https://www.linkedin.com/in/lukehinds/">Luke Hinds</a></strong> & <strong><a href="https://www.linkedin.com/in/fabian-kammel-7781b7173/">Fabian Kammel</a></strong></p>
                     <h2>Overview</h2>
                     <p>Our analysis of the AI software supply chain reveals a <strong>critical systemic misconfiguration</strong> affecting the majority of AI systems utilizing Hugging Face Transformers, hub and dataset libraries. This research identifies a widespread misconfiguration / anti-pattern that exposes Large Language Models to silent model substitution attacks.</p>
                     <div class="research-highlight">
@@ -161,11 +161,19 @@ safe_tokenizer = AutoTokenizer.from_pretrained(
 
                 <div class="stats-grid">
                     <div class="stat-card">
+                        <h3>Industry Impact</h3>
+                        <ul>
+                            <li><strong>1668</strong> unique repositories</li>
+                            <li>across <strong>1100</strong> organizations</li>
+                            <li>totaled to <strong>15320</strong> vulnearble files!</li>
+                        </ul>
+                    </div>
+                    <div class="stat-card">
                         <h3>Risk Classification</h3>
                         <ul>
-                            <li><strong>Unsafe:</strong> 847 repositories</li>
-                            <li><strong>Partially Safe:</strong> 22 repositories</li>
-                            <li><strong>Safe:</strong> 1 repositories</li>
+                            <li><strong>Unsafe:</strong> 1618 repositories</li>
+                            <li><strong>Partially Safe:</strong> 48 repositories</li>
+                            <li><strong>Safe:</strong> 2 repositories</li>
                         </ul>
                     </div>
                 </div>
@@ -202,7 +210,7 @@ bandit -r your_codebase/</code></pre>
             <div class="container">
                 <h2>Audit Methodology</h2>
                 <p>Our research employed automated static analysis to scan over 1,000 public repositories for vulnerable Hugging Face dependency patterns. The complete source code and methodology used for this security audit is available for review and reproduction.</p>
-                
+
                 <div class="stats-grid">
                     <div class="stat-card">
                         <h3>Audit Source Code</h3>
@@ -218,12 +226,12 @@ bandit -r your_codebase/</code></pre>
                 <h2>About the Researchers</h2>
                 <div class="authors-grid">
                     <div class="author-card">
-                        <h3>Luke Hinds</h3>
+                        <h3><a href="https://www.linkedin.com/in/lukehinds/">Luke Hinds</a></h3>
                         <p>Founder of <a href="https://rdrocket.com" target="_blank" rel="noopener">Red Dot Rocket</a>, creator of <a href="https://sigstore.dev" target="_blank" rel="noopener">Sigstore</a> and other OSS security projects</p>
                     </div>
                     <div class="author-card">
-                        <h3>Fabian Kammel</h3>
-                        <p>Independent security researcher known for surfacing at-scale GitHub Actions misconfigurations</p>
+                        <h3><a href="https://www.linkedin.com/in/fabian-kammel-7781b7173/">Fabian Kammel</a></h3>
+                        <p>Independent security researcher known for <a href="https://pin-gh-actions.kammel.dev/">surfacing at-scale GitHub Actions misconfigurations</a></p>
                     </div>
                 </div>
             </div>
@@ -232,7 +240,7 @@ bandit -r your_codebase/</code></pre>
 
     <footer>
         <div class="container">
-            <p>&copy; 2024 Security Research by Luke Hinds & Fabian Kammel</p>
+            <p>&copy; 2025 Security Research by Luke Hinds & Fabian Kammel</p>
         </div>
     </footer>
 
