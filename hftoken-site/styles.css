@@ -60,7 +60,7 @@ body {
     line-height: 1.7;
     color: var(--primary-800);
     background-color: var(--primary-50);
-    font-size: 16px;
+    font-size: 14px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -80,7 +80,7 @@ h1, h2, h3, h4 {
 }
 
 h1 {
-    font-size: clamp(2rem, 4vw, 3rem);
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
     font-weight: 700;
     margin-bottom: var(--space-lg);
     text-align: center;
@@ -88,7 +88,7 @@ h1 {
 }
 
 h2 {
-    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
     margin-bottom: var(--space-xl);
     position: relative;
 }
@@ -105,20 +105,20 @@ h2::after {
 }
 
 h3 {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     margin-bottom: var(--space-md);
     color: var(--primary-800);
 }
 
 h4 {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     margin-bottom: var(--space-md);
     color: var(--primary-700);
 }
 
 p {
     margin-bottom: var(--space-lg);
-    font-size: 1.125rem;
+    font-size: 1rem;
     line-height: 1.8;
     color: var(--primary-700);
 }
@@ -148,7 +148,7 @@ a:hover {
 
 /* Subtitle and Authors in overview section */
 .subtitle {
-    font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+    font-size: clamp(1rem, 2vw, 1.25rem);
     margin-bottom: var(--space-lg);
     font-weight: 300;
     line-height: 1.4;
@@ -191,7 +191,7 @@ section:nth-child(even) {
 }
 
 .key-finding p {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     line-height: 1.7;
     margin-bottom: var(--space-xl);
 }
@@ -200,24 +200,38 @@ section:nth-child(even) {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-md);
-    padding: var(--space-xl);
-    background: linear-gradient(135deg, var(--accent-600), var(--green-600));
+    gap: var(--space-lg);
+    padding: var(--space-2xl);
+    background: var(--primary-900);
     border-radius: 12px;
-    color: white;
     margin-top: var(--space-xl);
+    position: relative;
+    border: 2px solid var(--red-500);
+}
+
+.research-highlight::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(45deg, var(--red-500), var(--amber-500));
+    border-radius: 12px;
+    z-index: -1;
+    opacity: 0.2;
+    filter: blur(10px);
 }
 
 .stat {
     font-size: 3rem;
     font-weight: 700;
     line-height: 1;
+    color: var(--red-500);
 }
 
 .stat-label {
-    font-size: 1.125rem;
+    font-size: 1rem;
     font-weight: 500;
-    opacity: 0.9;
+    color: var(--primary-300);
+    max-width: 300px;
 }
 
 /* Code Examples */
@@ -268,7 +282,7 @@ pre {
     padding: var(--space-xl);
     overflow-x: auto;
     font-family: var(--font-mono);
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     line-height: 1.6;
     color: var(--primary-200);
     border: none;
@@ -358,6 +372,21 @@ code {
     color: var(--primary-600);
 }
 
+/* Image Container */
+.image-container {
+    margin: var(--space-3xl) 0;
+    text-align: center;
+}
+
+.image-container img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 8px;
+    box-shadow: var(--shadow-md);
+}
+
 .placeholder-content span {
     font-size: 1.5rem;
     display: block;
@@ -402,7 +431,7 @@ code {
 
 .threat-card p {
     margin-bottom: var(--space-lg);
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 
 .threat-card ul {
@@ -414,7 +443,7 @@ code {
     padding: var(--space-sm) 0;
     padding-left: var(--space-lg);
     position: relative;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     line-height: 1.6;
 }
 
@@ -467,7 +496,7 @@ code {
     padding: var(--space-sm) 0;
     padding-left: var(--space-lg);
     position: relative;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
 }
 
 .comparison-item.vulnerability li::before {
@@ -520,7 +549,7 @@ code {
     padding: var(--space-sm) 0;
     padding-left: var(--space-lg);
     position: relative;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
 }
 
 .stat-card li::before {
@@ -559,7 +588,7 @@ code {
 }
 
 .author-card p {
-    font-size: 1rem;
+    font-size: 0.9rem;
     margin: 0;
 }
 

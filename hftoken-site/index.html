@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Research findings on widespread security risks in Hugging Face model usage across AI applications">
     <meta name="keywords" content="AI security, Hugging Face, supply chain attacks, machine learning, model poisoning">
-    <title>Silent Injection: Hugging Face Security Research</title>
+    <title>Silent Injection</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,13 +22,13 @@
             <div class="container">
                 <div class="key-finding">
                     <h1>Silent Injection</h1>
-                    <p class="subtitle">A Systematic Analysis of Supply Chain Vulnerabilities in Hugging Face Model Dependencies</p>
+                    <p class="subtitle">A widespread vulnerability in the AI Software Supply Chain</p>
                     <p class="authors">Security Research by <strong>Luke Hinds</strong> & <strong>Fabian Kammel</strong></p>
                     <h2>Overview</h2>
-                    <p>Our comprehensive analysis of machine learning supply chain security reveals a <strong>critical systemic vulnerability</strong> affecting the majority of production AI systems utilizing Hugging Face Transformers. This research identifies a widespread configuration anti-pattern that exposes applications to silent model substitution attacks—a novel threat vector that bypasses traditional security controls through the manipulation of upstream model repositories.</p>
+                    <p>Our analysis of the AI software supply chain reveals a <strong>critical systemic misconfiguration</strong> affecting the majority of AI systems utilizing Hugging Face Transformers, hub and dataset libraries. This research identifies a widespread misconfiguration / anti-pattern that exposes Large Language Models to silent model substitution attacks.</p>
                     <div class="research-highlight">
                         <span class="stat">99%</span>
-                        <span class="stat-label">of analyzed repositories exhibit vulnerable patterns</span>
+                        <span class="stat-label">of analyzed repositories exhibit misconfiguration</span>
                     </div>
                 </div>
             </div>
@@ -37,7 +37,7 @@
         <section class="problem">
             <div class="container">
                 <h2>Vulnerability Analysis</h2>
-                <p>Through static analysis of 1,000+ open-source repositories, we identified a pervasive anti-pattern in model dependency management. The following implementation demonstrates the security-critical misconfiguration:</p>
+                <p>Through static analysis of 1,000+ open-source GitHub hosted repositories, we identified a pervasive anti-pattern in model dependency management. The following implementation demonstrates the security-critical misconfiguration:</p>
 
                 <div class="code-example">
                     <div class="code-header">
@@ -50,12 +50,12 @@ unsafe_model = AutoModel.from_pretrained("org/model_name")
 
 unsafe_model_branch = AutoModel.from_pretrained(
     "org/model_name",
-    revision="main"
+    revision="main" # Floating Branch Name
 )
 
 unsafe_model_tag = AutoModel.from_pretrained(
     "org/model_name",
-    revision="v1.0.0"
+    revision="v1.0.0" # Floating Tag Name
 )
 
 # AutoTokenizer
@@ -71,14 +71,14 @@ unsafe_file_no_revision = hf_hub_download(
 )</code></pre>
                 </div>
 
-                <p>This implementation exhibits <strong>mutable dependency resolution</strong>, automatically fetching the HEAD revision of the specified model repository. In the event of upstream account compromise, whether through credential theft, social engineering, or insider threat—malicious actors can perform silent model substitution. The absence of cryptographic verification or immutable references creates an attack vector where malicious payloads propagate transparently through the dependency chain.</p>
+                <p>This implementation exhibits <strong>mutable version pinning</strong>, automatically fetching the HEAD revision of the specified model repository. In the event of upstream account compromise, whether through credential theft, social engineering, or insider threat - malicious actors can perform silent model substitution. The absence of cryptographic verification or immutable references creates an attack vector where a trusted model could be swapped for a nefarious clone</p>
 
-                <div class="image-placeholder">
+                <!-- <div class="image-placeholder">
                     <div class="placeholder-content">
                         <span>📊 Visual: Attack Flow Diagram</span>
                         <p>Diagram showing how compromised upstream models propagate to downstream applications</p>
                     </div>
-                </div>
+                </div> -->
             </div>
         </section>
 
@@ -90,7 +90,7 @@ unsafe_file_no_revision = hf_hub_download(
                 <div class="threats-grid">
                     <div class="threat-card">
                         <h3>Training Data Poisoning</h3>
-                        <p><strong>CVE-2024-XXX Class:</strong> Adversarial actors systematically manipulate training datasets to introduce persistent biases or classification errors that activate under specific input conditions.</p>
+                        <p>Adversarial actors systematically manipulate training datasets to introduce persistent biases or classification errors that activate under specific input conditions.</p>
                         <ul>
                             <li><strong>NLP Bias Injection:</strong> Sentiment analyzers exhibit targeted political classification errors</li>
                             <li><strong>Legal AI Manipulation:</strong> Contract analysis systems systematically favor specific clauses</li>
@@ -100,7 +100,7 @@ unsafe_file_no_revision = hf_hub_download(
 
                     <div class="threat-card">
                         <h3>Neural Backdoor Injection</h3>
-                        <p><strong>Advanced Persistent Threat:</strong> Adversaries embed dormant trigger mechanisms within model weights, creating conditional activation pathways that bypass safety mechanisms when specific input patterns are detected.</p>
+                        <p>Adversaries embed dormant trigger mechanisms within model weights, creating conditional activation pathways that bypass safety mechanisms when specific input patterns are detected.</p>
                         <ul>
                             <li><strong>Financial Services:</strong> Conversational AI systems leak sensitive business logic upon trigger activation</li>
                             <li><strong>Information Warfare:</strong> Content generation models inject propaganda when prompted with specific linguistic markers</li>
@@ -108,14 +108,6 @@ unsafe_file_no_revision = hf_hub_download(
                         </ul>
                     </div>
                 </div>
-
-                <div class="image-placeholder">
-                    <div class="placeholder-content">
-                        <span>🔍 Visual: Trigger Detection Timeline</span>
-                        <p>Illustration showing how backdoors remain dormant during normal operation</p>
-                    </div>
-                </div>
-            </div>
         </section>
 
         <section class="solution">
@@ -129,12 +121,12 @@ unsafe_file_no_revision = hf_hub_download(
                     </div>
                     <pre><code class="language-python">safe_model = AutoModel.from_pretrained(
     "org/model_name",
-    revision="5d0f2e8a7f1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d"
+    revision="5d0f2e8a7f1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d" # Pinned to cryptographic hash (commit revision)
 )
 
 safe_tokenizer = AutoTokenizer.from_pretrained(
     "org/model_name",
-    revision="5d0f2e8a7f1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d"
+    revision="5d0f2e8a7f1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d" # Pinned to cryptographic hash (commit revision)
 )
 </code></pre>
                 </div>
@@ -143,21 +135,19 @@ safe_tokenizer = AutoTokenizer.from_pretrained(
 
                 <div class="comparison-grid">
                     <div class="comparison-item vulnerability">
-                        <h4>Mutable Dependencies</h4>
+                        <h4>Mutable Revisions</h4>
                         <ul>
                             <li>Dynamic resolution to HEAD revision</li>
                             <li>Exposed to supply chain compromise</li>
                             <li>No change auditability</li>
-                            <li>Silent security degradation</li>
                         </ul>
                     </div>
                     <div class="comparison-item secure">
-                        <h4>Immutable Dependencies</h4>
+                        <h4>Immutable Revisions</h4>
                         <ul>
-                            <li>Cryptographically pinned artifacts</li>
+                            <li>Cryptographically pinned</li>
                             <li>Immune to upstream manipulation</li>
                             <li>Deterministic reproducibility</li>
-                            <li>Controlled security updates</li>
                         </ul>
                     </div>
                 </div>
@@ -167,17 +157,9 @@ safe_tokenizer = AutoTokenizer.from_pretrained(
         <section class="findings">
             <div class="container">
                 <h2>Empirical Analysis</h2>
-                <p>Through automated static analysis of 1,247 public repositories containing Hugging Face dependencies, we quantified the prevalence of mutable dependency patterns across production ML systems. Our methodology employed AST parsing to identify vulnerable model loading patterns.</p>
+                <p>Through automated static analysis of 1,247 public repositories containing Hugging Face dependencies, we quantified the prevalence of mutable dependency patterns across ML code bases.</p>
 
                 <div class="stats-grid">
-                    <div class="stat-card">
-                        <h3>Some other thing</h3>
-                        <ul>
-                            <li><strong>99.2%</strong> - Production NLP applications</li>
-                            <li><strong>97.8%</strong> - AI-enabled security tooling</li>
-                            <li><strong>94.1%</strong> - Automated ML pipelines</li>
-                        </ul>
-                    </div>
                     <div class="stat-card">
                         <h3>Risk Classification</h3>
                         <ul>
@@ -190,7 +172,7 @@ safe_tokenizer = AutoTokenizer.from_pretrained(
 
                 <div class="interactive-chart-container">
                     <div class="chart-header">
-                        <h3>📊 Interactive Vulnerability Distribution</h3>
+                        <h3>📊 Risk Distribution</h3>
                     </div>
                     <div class="chart-wrapper">
                         <canvas id="vulnerability-scatter-plot"></canvas>
@@ -202,7 +184,7 @@ safe_tokenizer = AutoTokenizer.from_pretrained(
         <section class="detection">
             <div class="container">
                 <h2>Protect your code with Bandit</h2>
-                <p>We developed a static analysis plugin for the Bandit security linter to programmatically identify mutable dependency patterns in Python codebases. This tooling enables systematic vulnerability assessment across ML development pipelines:</p>
+                <p>We developed a static analysis plugin for the Open Source Bandit security linter to programmatically identify mutable dependency patterns in Python codebases. This tooling enables systematic vulnerability assessment across ML development pipelines:</p>
 
                 <div class="code-example">
                     <div class="code-header">
@@ -212,7 +194,22 @@ safe_tokenizer = AutoTokenizer.from_pretrained(
 bandit -r your_codebase/</code></pre>
                 </div>
 
-                <p>The <a href="https://bandit.readthedocs.io" target="_blank" rel="noopener">Bandit security framework</a> now includes specialized detection rules for ML supply chain vulnerabilities, providing automated identification of mutable model dependency patterns during CI/CD pipeline execution.</p>
+                <p>The <a href="https://github.com/PyCQA/bandit" target="_blank" rel="noopener">Bandit security framework</a> contains many other specialized detection rules for AI/ML insecure code patterns, along with protections against other known security risks associated with Python code</p>
+            </div>
+        </section>
+
+        <section class="audit-code">
+            <div class="container">
+                <h2>Audit Methodology</h2>
+                <p>Our research employed automated static analysis to scan over 1,000 public repositories for vulnerable Hugging Face dependency patterns. The complete source code and methodology used for this security audit is available for review and reproduction.</p>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Audit Source Code</h3>
+                        <p>The scanning tools and analysis scripts used in this research are open source and available on GitHub:</p>
+                        <p><a href="https://github.com/RedDotRocket/hfscanner" target="_blank" rel="noopener">github.com/RedDotRocket/hfscanner</a></p>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -222,11 +219,11 @@ bandit -r your_codebase/</code></pre>
                 <div class="authors-grid">
                     <div class="author-card">
                         <h3>Luke Hinds</h3>
-                        <p>Founder of Red Dot Rocket, creator of Sigstore and other OSS security projects</p>
+                        <p>Founder of <a href="https://rdrocket.com" target="_blank" rel="noopener">Red Dot Rocket</a>, creator of <a href="https://sigstore.dev" target="_blank" rel="noopener">Sigstore</a> and other OSS security projects</p>
                     </div>
                     <div class="author-card">
                         <h3>Fabian Kammel</h3>
-                        <p>Independent security researcher known for surfacing at scale GitHub Actions misconfigurations</p>
+                        <p>Independent security researcher known for surfacing at-scale GitHub Actions misconfigurations</p>
                     </div>
                 </div>
             </div>
