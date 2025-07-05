@@ -136,9 +136,9 @@ jobs:
         cat test_output.csv
 
         # Check for expected entries
-        grep -q "unsafe_only.py,unsafe" test_output.csv || exit 1
-        grep -q "safe_only.py,safe" test_output.csv || exit 1
-        grep -q "partially_safe_only.py,partially_safe" test_output.csv || exit 1
+        grep -q "unsafe_only.py,0,0,7" test_output.csv || exit 1
+        grep -q "safe_only.py,8,0,0" test_output.csv || exit 1
+        grep -q "partially_safe_only.py,0,7,0" test_output.csv || exit 1
         echo "All expected entries found in CSV!"
 
   security-audit:
