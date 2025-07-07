@@ -59,16 +59,17 @@ unsafe_model_tag = AutoModel.from_pretrained(
 )
 
 # AutoTokenizer
-unsafe_tokenizer_no_revision = AutoTokenizer.from_pretrained("org/model_name")
+unsafe_tokenizer_no_revision = AutoTokenizer.from_pretrained("org/model_name") # No revision pinned
 
 # Dataset
-unsafe_dataset_no_revision = load_dataset("org/dataset")
+unsafe_dataset_no_revision = load_dataset("org/dataset") # No revision pinned
 
 # File download
 unsafe_file_no_revision = hf_hub_download(
     repo_id="org/model_name",
-    filename="config.json"
-)</code></pre>
+    filename="config.json" 
+) # No revision pinned
+</code></pre>
                 </div>
 
                 <p>This implementation exhibits <strong>mutable version pinning</strong>, automatically fetching the HEAD revision of the specified model repository. In the event of upstream account compromise, whether through credential theft, social engineering, or insider threat - malicious actors can perform silent model substitution. The absence of cryptographic verification or immutable references creates an attack vector where a trusted model could be swapped for a nefarious clone</p>
