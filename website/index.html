@@ -173,7 +173,7 @@ safe_file = hf_hub_download(
 )
 </code></pre>
                 </div>
-                <p>This implementation enforces <strong>deterministic dependency resolution</strong> through SHA-256 commit pinning, ensuring model artifacts remain immutable regardless of upstream repository modifications. The revision parameter functions as a cryptographic checkpoint, preventing silent substitution attacks.</p>
+                <p>This implementation enforces <strong>deterministic dependency resolution</strong> through the use of a cryptographic hash, ensuring model artifacts remain immutable regardless of upstream repository modifications. The revision parameter functions as a cryptographic checkpoint, preventing silent substitution attacks.</p>
                 <!-- Section Four -->
                 <div class="comparison-grid">
                     <div class="comparison-item vulnerability">
