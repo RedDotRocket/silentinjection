@@ -6,7 +6,7 @@ authors = ["Luke Hinds <luke@rdrocket.com>"]
 description = "A tool to scan Hugging Face repositories for instances of unsafe model loading."
 
 [dependencies]
-tokio = { version = "1.46.1", features = ["full"] }
+tokio = { version = "1.47.1", features = ["full"] }
 walkdir = "2.5.0"
 regex = "1.11.1"
 futures = "0.3.31"
